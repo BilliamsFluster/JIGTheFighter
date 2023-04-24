@@ -31,7 +31,23 @@ public class AIController : Controller
     bool playerNear;
     bool isPatrol;
     bool caughtPlayer;
+    private float _animationBlend;
+    public float SpeedChangeRate = 10.0f;
+    bool hasPlayedSwooshSound = false;
+    [SerializeField] private float slashDuration = 0.5f;
+    private bool attacking = false;
 
+
+    // animation IDs
+    private int _animIDSpeed;
+    private int _animIDGrounded;
+    private int _animIDJump;
+    private int _animIDFreeFall;
+    private int _animIDMotionSpeed;
+    private int _animIDAttack;
+
+    private Animator _animator;
+    private bool _hasAnimator;
 
     void Start()
     {
@@ -42,16 +58,32 @@ public class AIController : Controller
         waitTime = startWaitTime;
         timeToRotate = rotateTime;
 
+
         currentWayPointIndex = 0;
         navMeshAgent = GetComponent<NavMeshAgent>();
         navMeshAgent.speed = walkSpeed;
         navMeshAgent.SetDestination(waypoints[currentWayPointIndex].position);
 
+        _hasAnimator = TryGetComponent(out _animator);
+        _animator = GetComponent<Animator>();
+
+        AssignAnimationIDs();
+    }
+
+    private void AssignAnimationIDs()
+    {
+        _animIDSpeed = Animator.StringToHash("Speed");
+        _animIDGrounded = Animator.StringToHash("Grounded");
+        _animIDJump = Animator.StringToHash("Jump");
+        _animIDFreeFall = Animator.StringToHash("FreeFall");
+        _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+        _animIDAttack = Animator.StringToHash("Attack");
     }
 
     // Update is called once per frame
     void Update()
     {
+        _animator = GetComponent<Animator>();
         EnvironmentView();
 
         if(!isPatrol)
@@ -62,6 +94,35 @@ public class AIController : Controller
         {
             Patroling();
         }
+        _animator.SetFloat(_animIDSpeed, navMeshAgent.velocity.magnitude);
+        
+    }
+    private void Attack()
+    {
+        if (_hasAnimator)
+        {
+
+
+            if (!hasPlayedSwooshSound)
+            {
+                //GameManager.instance.PlaySwordSlash();
+                hasPlayedSwooshSound = true;
+            }
+            _animator.Play("Attack");
+            StartCoroutine(WaitForAttactDuration());
+
+
+        }
+
+
+    }
+    private IEnumerator WaitForAttactDuration()
+    {
+        yield return new WaitForSeconds(slashDuration);
+        attacking = false;
+        hasPlayedSwooshSound = false;
+
+
     }
 
     private void Chasing()
@@ -74,6 +135,8 @@ public class AIController : Controller
             Move(runSpeed);
             navMeshAgent.SetDestination(playerPosition);
         }
+        
+
         if(navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
         {
             if(waitTime <= 0  && !caughtPlayer && Vector3.Distance(transform.position, GameObject.FindGameObjectWithTag("Player").transform.position) <= 6f)
@@ -91,9 +154,13 @@ public class AIController : Controller
                 {
                     Stop();
                     waitTime -= Time.deltaTime;
+                    
                 }
             }
+            
         }
+        
+
     }
 
 
@@ -168,6 +235,7 @@ public class AIController : Controller
                 navMeshAgent.SetDestination(waypoints[currentWayPointIndex].position);
                 waitTime = startWaitTime;
                 timeToRotate = rotateTime;
+                
             }
             else
             {
@@ -207,6 +275,12 @@ public class AIController : Controller
             if (playerInRange)
             {
                 playerPosition = player.transform.position;
+            }
+            if(Vector3.Distance(transform.position, playerPosition) <= 1f && playerInRange)
+            {
+                attacking = true;
+                Attack();
+                Debug.Log(Vector3.Distance(transform.position, playerPosition));
             }
         }
     }
