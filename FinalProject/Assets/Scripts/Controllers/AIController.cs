@@ -35,7 +35,6 @@ public class AIController : Controller
     public float SpeedChangeRate = 10.0f;
     bool hasPlayedSwooshSound = false;
     [SerializeField] private float slashDuration = 0.5f;
-    private bool attacking = false;
 
 
     // animation IDs
@@ -103,11 +102,6 @@ public class AIController : Controller
         {
 
 
-            if (!hasPlayedSwooshSound)
-            {
-                //GameManager.instance.PlaySwordSlash();
-                hasPlayedSwooshSound = true;
-            }
             _animator.Play("Attack");
             StartCoroutine(WaitForAttactDuration());
 
@@ -116,10 +110,23 @@ public class AIController : Controller
 
 
     }
+
+
+    protected override void AttackStart()
+    {
+        GameManager.instance.PlaySwordSlash();
+        base.AttackStart();
+    }
+
+    protected override void AttackEnd()
+    {
+        base.AttackEnd();
+    }
+
     private IEnumerator WaitForAttactDuration()
     {
         yield return new WaitForSeconds(slashDuration);
-        attacking = false;
+        
         hasPlayedSwooshSound = false;
 
 
@@ -278,9 +285,8 @@ public class AIController : Controller
             }
             if(Vector3.Distance(transform.position, playerPosition) <= 1f && playerInRange)
             {
-                attacking = true;
+                
                 Attack();
-                Debug.Log(Vector3.Distance(transform.position, playerPosition));
             }
         }
     }

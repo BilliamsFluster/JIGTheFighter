@@ -2,6 +2,7 @@
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
 using System.Collections;
+using UnityEngine.Profiling;
 #endif
 
 /* Note: animations are called via the controller for both the character and capsule using animator null checks
@@ -105,7 +106,6 @@ namespace StarterAssets
 
 
         //Sound checks
-        private bool hasPlayedSwooshSound = false;
         [SerializeField] private float slashDuration = 0.2f;
 
 #if ENABLE_INPUT_SYSTEM 
@@ -302,13 +302,6 @@ namespace StarterAssets
         {
             if (_hasAnimator)
             {
-                    
-                    
-                if(!hasPlayedSwooshSound)
-                {
-                    GameManager.instance.PlaySwordSlash();
-                    hasPlayedSwooshSound = true;
-                }
                 _animator.Play("Attack");
                 StartCoroutine(WaitForAttactDuration());
 
@@ -317,11 +310,24 @@ namespace StarterAssets
                
             
         }
+
+        protected override void AttackStart()
+        {
+            
+            GameManager.instance.PlaySwordSlash();
+            base.AttackStart();
+           
+        }
+
+        protected override void AttackEnd()
+        {
+            base.AttackEnd();
+        }
         private IEnumerator WaitForAttactDuration()
         {
             yield return new WaitForSeconds(slashDuration);
             _input.attacking = false;
-            hasPlayedSwooshSound = false;
+            
 
 
         }
