@@ -20,9 +20,14 @@ namespace StarterAssets
 		[Header("Mouse Cursor Settings")]
 		public bool cursorLocked = true;
 		public bool cursorInputForLook = true;
+		[SerializeField] private GameObject swordObj;
+
+        private void Start()
+        {
+        }
 
 #if ENABLE_INPUT_SYSTEM
-		public void OnMove(InputValue value)
+        public void OnMove(InputValue value)
 		{
 			MoveInput(value.Get<Vector2>());
 		}
@@ -69,6 +74,9 @@ namespace StarterAssets
 		public void AttackInput(bool attack)
 		{
 			attacking = attack;
+			
+
+
 		}
 
 		public void SprintInput(bool newSprintState)

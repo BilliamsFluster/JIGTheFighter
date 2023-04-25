@@ -34,9 +34,10 @@ public class AIHealthManager : HealthManager
             {
                 OnAIDeath(gameObject);
             }
-            Destroy(gameObject);
+            
 
         }
+        Destroy(gameObject);
     }
 
     public override void TakeDamage(float dmg, GameObject instigator)
