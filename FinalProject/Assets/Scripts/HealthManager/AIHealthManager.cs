@@ -29,6 +29,11 @@ public class AIHealthManager : HealthManager
             if (player != null)
             {
                 player.AddScore(deathScoreReward);
+                HealthManager playerHealth = player.GetComponent<HealthManager>();
+                if(playerHealth != null)
+                {
+                    playerHealth.SetHealth(playerHealth.maxHealth);
+                }
             }
             if (OnAIDeath != null)
             {
