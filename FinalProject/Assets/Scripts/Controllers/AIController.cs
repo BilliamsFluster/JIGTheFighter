@@ -73,6 +73,7 @@ public class AIController : Controller
         _animator = GetComponent<Animator>();
 
         AssignAnimationIDs();
+        GameManager.instance.GetEnemies().Add(this);
     }
 
     private void AssignAnimationIDs()

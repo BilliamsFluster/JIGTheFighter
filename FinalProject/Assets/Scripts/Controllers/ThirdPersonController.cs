@@ -160,6 +160,7 @@ namespace StarterAssets
             // reset our timeouts on start
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
+            GameManager.instance.GetPlayers().Add(this);
         }
 
         private void Update()

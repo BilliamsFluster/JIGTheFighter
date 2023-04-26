@@ -43,6 +43,7 @@ public class AIHealthManager : HealthManager
 
         }
         Destroy(gameObject);
+        GameManager.instance.GetEnemies().Remove(GetComponent<AIController>());
     }
 
     public override void TakeDamage(float dmg, GameObject instigator)
