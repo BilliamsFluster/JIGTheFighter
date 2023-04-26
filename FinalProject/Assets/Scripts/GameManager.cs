@@ -10,8 +10,17 @@ public class GameManager : MonoBehaviour
     public AudioClip swordSound;
 
     [SerializeField] public GameObject playerToSpawn;
-    private List<ThirdPersonController> players;
-    private List<AIController> enemies;
+    [SerializeField] private List<ThirdPersonController> players;
+    [SerializeField] private List<AIController> enemies;
+
+    public List<ThirdPersonController> GetPlayers()
+    {
+        return players;
+    }
+    public List<AIController> GetEnemies()
+    {
+        return enemies;
+    }
 
 
     public void Start()
