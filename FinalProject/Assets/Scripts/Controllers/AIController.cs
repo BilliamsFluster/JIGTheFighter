@@ -29,15 +29,22 @@ public class AIController : Controller
     float timeToRotate;
     bool playerInRange;
     bool playerNear;
-    bool isPatrol;
+    [SerializeField] private bool isPatrol;
     bool caughtPlayer;
     private float _animationBlend;
     public float SpeedChangeRate = 10.0f;
-    bool hasPlayedSwooshSound = false;
-    [SerializeField] private float slashDuration = 0.5f;
 
 
-    // animation IDs
+    //Patroling 
+    protected bool walkPointSet;
+    [SerializeField] private float walkPointRange;
+    [SerializeField] private Vector3 walkPoint;
+    [SerializeField] private bool randomPatrol = false;
+    [SerializeField] private LayerMask groundMask;
+
+
+
+  // animation IDs
     private int _animIDSpeed;
     private int _animIDGrounded;
     private int _animIDJump;
@@ -51,7 +58,6 @@ public class AIController : Controller
     void Start()
     {
         playerPosition = Vector3.zero;
-        isPatrol = false;
         caughtPlayer = false;
         playerInRange = false;
         waitTime = startWaitTime;
@@ -94,59 +100,66 @@ public class AIController : Controller
             Patroling();
         }
         _animator.SetFloat(_animIDSpeed, navMeshAgent.velocity.magnitude);
-        
+        if (!navMeshAgent.updatePosition) GroundCharacter();
+
     }
     private void Attack()
     {
         if (_hasAnimator)
         {
-
-
             _animator.Play("Attack");
-            StartCoroutine(WaitForAttactDuration());
-
-
         }
 
 
     }
+    private void GroundCharacter()
+    {
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(transform.position, out hit, 1.0f, NavMesh.AllAreas))
+        {
+            transform.position = hit.position;
+        }
+    }
+
 
 
     protected override void AttackStart()
     {
         GameManager.instance.PlaySwordSlash();
         base.AttackStart();
+
+        navMeshAgent.updatePosition = false;
+        navMeshAgent.updateRotation = false;
     }
 
     protected override void AttackEnd()
     {
         base.AttackEnd();
-    }
+        navMeshAgent.SetDestination(transform.position);
 
-    private IEnumerator WaitForAttactDuration()
-    {
-        yield return new WaitForSeconds(slashDuration);
-        
-        hasPlayedSwooshSound = false;
-
+        navMeshAgent.updatePosition = true;
+        navMeshAgent.updateRotation = true;
 
     }
 
     private void Chasing()
     {
+        
+        
         playerNear = false;
         playerLastPosition = Vector3.zero;
 
-        if(!caughtPlayer)
+        if (!caughtPlayer)
         {
             Move(runSpeed);
             navMeshAgent.SetDestination(playerPosition);
         }
-        
 
-        if(navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+
+        // Check if the NavMeshAgent is active before accessing its properties
+        if (navMeshAgent.enabled && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
         {
-            if(waitTime <= 0  && !caughtPlayer && Vector3.Distance(transform.position, GameObject.FindGameObjectWithTag("Player").transform.position) <= 6f)
+            if (waitTime <= 0 && !caughtPlayer && Vector3.Distance(transform.position, GameObject.FindGameObjectWithTag("Player").transform.position) <= 6f)
             {
                 isPatrol = true;
                 playerNear = false;
@@ -157,15 +170,17 @@ public class AIController : Controller
             }
             else
             {
-                if(Vector3.Distance(transform.position, GameObject.FindGameObjectWithTag("Player").transform.position) >= 2.5f)
+                if (Vector3.Distance(transform.position, GameObject.FindGameObjectWithTag("Player").transform.position) >= 2.5f)
                 {
                     Stop();
                     waitTime -= Time.deltaTime;
-                    
+
                 }
             }
-            
+
         }
+        
+        
         
 
     }
@@ -189,24 +204,61 @@ public class AIController : Controller
         }
         else
         {
-            playerNear = false;
-            playerLastPosition = Vector3.zero;
-            navMeshAgent.SetDestination(waypoints[currentWayPointIndex].position);
-            if(navMeshAgent.remainingDistance < navMeshAgent.stoppingDistance)
+            if(!randomPatrol)
             {
-                if(waitTime <= 0)
+                playerNear = false;
+                playerLastPosition = Vector3.zero;
+                navMeshAgent.SetDestination(waypoints[currentWayPointIndex].position);
+                if (navMeshAgent.remainingDistance < navMeshAgent.stoppingDistance)
                 {
-                    NextPoint();
-                    Move(walkSpeed);
-                    waitTime = startWaitTime;
-                }
-                else
-                {
-                    Stop();
-                    waitTime -= Time.deltaTime;
+                    if (waitTime <= 0)
+                    {
+                        NextPoint();
+                        Move(walkSpeed);
+                        waitTime = startWaitTime;
+                    }
+                    else
+                    {
+                        Stop();
+                        waitTime -= Time.deltaTime;
+                    }
                 }
             }
+            else
+            {
+                RandomPatrol();
+            }
+           
         }
+    }
+
+    void RandomPatrol()
+    {
+        if (!walkPointSet) SearchWalkPoint(); // find a walkpoint
+        if (walkPointSet)
+        {
+            navMeshAgent.SetDestination(walkPoint); // set location to move towards to a random walkpoint
+
+        }
+
+        Vector3 distanceToWalkPoint = transform.position - walkPoint; // did we reach the walkpoint
+
+        if (distanceToWalkPoint.magnitude <= 2f)
+        {
+            walkPointSet = false; // find another walkpoint
+        }
+    }
+
+    private void SearchWalkPoint()
+    {
+        //calculate random point in range
+        float randomRangeZ = Random.Range(-walkPointRange, walkPointRange);
+        float randomRangeX = Random.Range(-walkPointRange, walkPointRange);
+
+        walkPoint = new Vector3(transform.position.x + randomRangeX, transform.position.y, transform.position.z + randomRangeZ); // set walk point to the result of the random generated position
+        
+        walkPointSet = true;
+
     }
 
     void Move(float speed)
@@ -233,16 +285,19 @@ public class AIController : Controller
     void LookingPlayer(Vector3 player)
     {
         navMeshAgent.SetDestination(player);
-        if(Vector3.Distance(transform.position, player) <= 0.3)
+        Vector3 direction = (player - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * navMeshAgent.angularSpeed);
+
+        if (Vector3.Distance(transform.position, player) <= 0.3)
         {
-            if(waitTime <= 0)
+            if (waitTime <= 0)
             {
                 playerNear = false;
                 Move(walkSpeed);
                 navMeshAgent.SetDestination(waypoints[currentWayPointIndex].position);
                 waitTime = startWaitTime;
                 timeToRotate = rotateTime;
-                
             }
             else
             {
@@ -250,8 +305,8 @@ public class AIController : Controller
                 waitTime = Time.deltaTime;
             }
         }
-            
     }
+
     void EnvironmentView()
     {
         Collider[] m_playersInRange = Physics.OverlapSphere(transform.position, viewRadius, playerMask);
@@ -260,9 +315,11 @@ public class AIController : Controller
         {
             Transform player = m_playersInRange[i].transform;
             Vector3 dirToPlayer = (player.position - transform.position).normalized;
+            float distToPlayer = Vector3.Distance(transform.position, player.transform.position);
             if (Vector3.Angle(transform.forward, dirToPlayer) < viewAngle / 2)
             {
-                float distToPlayer = Vector3.Distance(transform.position, player.position);
+                
+
                 if (!Physics.Raycast(transform.position, dirToPlayer, distToPlayer, obstacleMask))
                 {
                     playerInRange = true;
@@ -279,11 +336,13 @@ public class AIController : Controller
                 playerInRange = false;
 
             }
-            if (playerInRange)
+            if (playerInRange) // move to player
             {
                 playerPosition = player.transform.position;
             }
-            if(Vector3.Distance(transform.position, playerPosition) <= 1f && playerInRange)
+
+
+            if (Vector3.Distance(transform.position, playerPosition) <= 2f && playerInRange)
             {
                 
                 Attack();

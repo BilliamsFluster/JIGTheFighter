@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using StarterAssets;
-
 public class SwordTrigger : MonoBehaviour
 {
 
@@ -12,7 +10,7 @@ public class SwordTrigger : MonoBehaviour
         playerhealth = GameObject.Find("PlayerArmature").GetComponent<PlayerHealthManager>();
     }
 
-    public virtual void OnTriggerEnter(Collider other)
+    public void OnTriggerEnter(Collider other)
     {
         
         if(other.tag == "Enemy")
@@ -20,7 +18,7 @@ public class SwordTrigger : MonoBehaviour
             HealthManager enemyHealth = other.GetComponent<HealthManager>();
             if (enemyHealth)
             {
-                enemyHealth.TakeDamage(playerhealth.attackDmg, gameObject);
+                enemyHealth.TakeDamage(playerhealth.attackDmg, GameObject.Find("PlayerArmature"));
             }
         }
     }

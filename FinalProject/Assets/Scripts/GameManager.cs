@@ -70,6 +70,5 @@ public class GameManager : MonoBehaviour
     public void PlaySwordSlash()
     {
         swordSlash.PlayOneShot(swordSound);
-        Debug.Log("Sound");
     }
 }

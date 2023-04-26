@@ -44,6 +44,12 @@ public class HealthManager : MonoBehaviour
     {
         
     }
+    public void SetHealth(float health)
+    {
+        this.health = health;
+        healthBar.UpdateHealthBar(health, maxHealth);
+
+    }
 
     protected virtual void Death(GameObject instigator)
     {
