@@ -6,11 +6,13 @@ public class EnemySpawner : MonoBehaviour
 {
     [SerializeField] private GameObject enemyToSpawn;
     [SerializeField] private float playerCount;
+    [SerializeField] private Transform PlayerSpawnLocation;
 
     // Start is called before the first frame update
     void Start()
     {
         SpawnPlayers();
+        GameManager.instance.SpawnPlayers(PlayerSpawnLocation);
     }
 
     // Update is called once per frame
