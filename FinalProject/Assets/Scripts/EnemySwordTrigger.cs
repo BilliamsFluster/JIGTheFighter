@@ -21,10 +21,5 @@ public class EnemySwordTrigger : MonoBehaviour
                 playerHealth.TakeDamage(aiHealth.attackDmg, gameObject);
             }
         }
-
-
-
-
-
     }
 }
