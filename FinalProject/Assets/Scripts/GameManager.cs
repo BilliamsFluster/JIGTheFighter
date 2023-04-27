@@ -1,6 +1,7 @@
 using StarterAssets;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,10 +9,25 @@ public class GameManager : MonoBehaviour
 
     private AudioSource swordSlash;
     public AudioClip swordSound;
+    public bool gameOver;
+    public float swordVolume = 0f;
 
     [SerializeField] public GameObject playerToSpawn;
     [SerializeField] private List<ThirdPersonController> players;
     [SerializeField] private List<AIController> enemies;
+
+
+    //Game States
+
+    //[SerializeField] private GameObject TitleSccreenStateObject;
+    //[SerializeField] private GameObject MainMenuStateObject;
+    //[SerializeField] private GameObject OptionsScreenStateObject;
+    //[SerializeField] private GameObject CreditsScreenStateObject;
+    //[SerializeField] private GameObject GameplayStateObject;
+    //[SerializeField] private GameObject GameOverScreenStateObject;
+    //[SerializeField] private GameObject GameOverScreen;
+
+
 
     public List<ThirdPersonController> GetPlayers()
     {
@@ -25,10 +41,17 @@ public class GameManager : MonoBehaviour
 
     public void Start()
     {
-        swordSlash = GetComponent<AudioSource>();
-        players = new List<ThirdPersonController>();
-        enemies = new List<AIController>();
-        SpawnPlayers();
+        if (SceneManager.GetActiveScene().name != "Level")
+        {
+           
+        }
+        else
+        {
+           
+            
+        }
+
+       
     }
     void Awake()
     {
@@ -42,42 +65,69 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        swordSlash = GetComponent<AudioSource>();
+        players = new List<ThirdPersonController>();
+        enemies = new List<AIController>();
     }
     
 
-    public void SpawnPlayers()
+    public void SpawnPlayers(Transform T)
     {
         
-        BoxCollider spawnArea = GetComponent<BoxCollider>();
         
-        if (spawnArea)
-        {
-            // Get the dimensions of the box collider
-            Vector3 boxSize = spawnArea.bounds.size;
 
-            // Calculate the minimum and maximum positions within the collider
-            Vector3 minPosition = spawnArea.bounds.min;
-            Vector3 maxPosition = spawnArea.bounds.max;
+        Instantiate(playerToSpawn, T.position, Quaternion.identity);
 
-            Vector3 randomPosition = new Vector3(Random.Range(minPosition.x, maxPosition.x),
-                                                        Random.Range(minPosition.y, maxPosition.y),
-                                                        Random.Range(minPosition.z, maxPosition.z));
+        //Controller newController = GameObject.Find("PlayerArmature").GetComponent<Controller>();
+        Cursor.lockState = CursorLockMode.Locked;
 
-
-            Instantiate(playerToSpawn, randomPosition, Quaternion.identity);
-
-            //Controller newController = GameObject.Find("PlayerArmature").GetComponent<Controller>();
-            Cursor.lockState = CursorLockMode.Locked;
-
-
-            // Wait for a short amount of time to allow the new objects to initialize
-        }
-        
     }
 
 
     public void PlaySwordSlash()
     {
-        swordSlash.PlayOneShot(swordSound);
+        swordSlash.PlayOneShot(swordSound,swordVolume);
     }
+
+    public void ActivateMainMenuScreen()
+    {
+
+        
+        gameOver = false;
+
+    }
+
+
+    public void Restart()
+    {
+        if (SceneManager.GetActiveScene().name == "Level")
+        {
+            OpenLevel();
+
+        }
+    }
+
+    public void OpenLevel()
+    {
+        SceneManager.LoadScene("Level");
+    }
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
+
+
+
+
+    }
+    public void ActivateGameOverScreen()
+    {
+
+        //GameOverScreen.SetActive(true);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+        gameOver = true;
+
+    }
+
+
 }
