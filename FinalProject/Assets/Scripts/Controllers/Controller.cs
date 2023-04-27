@@ -43,4 +43,9 @@ public class Controller : MonoBehaviour
             sword.isTrigger = false;
         }
     }
+
+    public int GetScore()
+    {
+        return playerScore;
+    }
 }
