@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class AIController : Controller
+public class AIController : Controller, IHear
 {
     public NavMeshAgent navMeshAgent;
     public float startWaitTime = 4f;
@@ -33,7 +33,7 @@ public class AIController : Controller
     bool caughtPlayer;
     private float _animationBlend;
     public float SpeedChangeRate = 10.0f;
-
+    public bool notifySpawnerToRespawn = true;
 
     //Patroling 
     protected bool walkPointSet;
@@ -54,6 +54,8 @@ public class AIController : Controller
 
     private Animator _animator;
     private bool _hasAnimator;
+    private bool heardSound = false;
+    private Vector3 soundLoc;
 
     void Start()
     {
@@ -100,9 +102,42 @@ public class AIController : Controller
         {
             Patroling();
         }
+        if (heardSound)
+        {
+            navMeshAgent.SetDestination(soundLoc);
+            if (Vector3.Distance(transform.position, soundLoc) <= 2f)
+            {
+                heardSound = false;
+
+            }
+        }
+    
+        
+
+          
+        
+
+        
+        
+            
+        
+        
         _animator.SetFloat(_animIDSpeed, navMeshAgent.velocity.magnitude);
         if (!navMeshAgent.updatePosition) GroundCharacter();
 
+    }
+    void MoveTo(Vector3 pos)
+    {
+        soundLoc = pos;
+        
+    }
+    public void RespondToSound(Sound sound)
+    {
+        
+        isPatrol = false;
+        heardSound = true;
+        Debug.Log("CanHear" + sound.pos);
+        MoveTo(sound.pos);
     }
     private void Attack()
     {
@@ -186,6 +221,7 @@ public class AIController : Controller
 
     }
 
+  
 
     private void Patroling()
     {
@@ -311,7 +347,6 @@ public class AIController : Controller
     void EnvironmentView()
     {
         Collider[] m_playersInRange = Physics.OverlapSphere(transform.position, viewRadius, playerMask);
-
         for (int i = 0; i < m_playersInRange.Length; i++)
         {
             Transform player = m_playersInRange[i].transform;
@@ -335,15 +370,19 @@ public class AIController : Controller
             if (Vector3.Distance(transform.position, playerPosition) > viewRadius)
             {
                 playerInRange = false;
+                isPatrol = true;
 
             }
             if (playerInRange) // move to player
             {
                 playerPosition = player.transform.position;
+                heardSound = false;
+                
             }
+            
 
 
-            if (Vector3.Distance(transform.position, playerPosition) <= 2f && playerInRange)
+            if (Vector3.Distance(transform.position, playerPosition) <= 1f && playerInRange)
             {
                 
                 Attack();

@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    private AudioSource swordSlash;
+    public AudioSource swordSlash;
     public AudioClip swordSound;
     public bool gameOver;
     public float swordVolume = 0f;
@@ -29,8 +29,10 @@ public class GameManager : MonoBehaviour
     }
     public List<AIController> GetEnemies()
     {
+        
         return enemies;
     }
+    
 
 
     public void Start()

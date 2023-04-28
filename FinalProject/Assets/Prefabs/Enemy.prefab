@@ -675,6 +675,7 @@ MonoBehaviour:
   - {fileID: 4328543135303358253}
   isPatrol: 1
   SpeedChangeRate: 10
+  notifySpawnerToRespawn: 1
   walkPointRange: 5
   walkPoint: {x: 0, y: 0, z: 0}
   randomPatrol: 1
