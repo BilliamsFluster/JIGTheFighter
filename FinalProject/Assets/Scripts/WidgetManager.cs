@@ -10,8 +10,6 @@ public class WidgetManager : MonoBehaviour
     public GameObject OptionsScreenStateObject;
     public GameObject CreditsScreenStateObject;
     public GameObject GameplayStateObject;
-    public GameObject GameOverScreenStateObject;
-    private GameObject GameOverScreen;
 
 
     // Start is called before the first frame update
@@ -35,7 +33,6 @@ public class WidgetManager : MonoBehaviour
         OptionsScreenStateObject.SetActive(false);
         CreditsScreenStateObject.SetActive(false);
         GameplayStateObject.SetActive(false);
-        GameOverScreenStateObject.SetActive(false);
     }
     public void ActivateTitleScreen()
     {

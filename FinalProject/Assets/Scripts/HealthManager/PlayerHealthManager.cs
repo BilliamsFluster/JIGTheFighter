@@ -5,10 +5,10 @@ using StarterAssets;
 
 public class PlayerHealthManager : HealthManager
 {
-    // Start is called before the first frame update
+    Controller playerController;
     void Start()
     {
-        
+        playerController = GetComponent<ThirdPersonController>();
     }
 
     // Update is called once per frame
@@ -18,8 +18,12 @@ public class PlayerHealthManager : HealthManager
     }
     protected override void Death(GameObject instigator)
     {
-        Destroy(gameObject);
+       
         GameManager.instance.GetPlayers().Remove(GetComponent<ThirdPersonController>());
+        GameManager.instance.ActivateGameOverScreen();
+        Destroy(gameObject);
+
+
     }
 
     public override void TakeDamage(float dmg, GameObject instigator)

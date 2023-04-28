@@ -33,6 +33,7 @@ public class AIHealthManager : HealthManager
                 if(playerHealth != null)
                 {
                     playerHealth.SetHealth(playerHealth.maxHealth);
+                    GameManager.instance.playerScore = player.GetScore();
                 }
             }
             if (OnAIDeath != null)

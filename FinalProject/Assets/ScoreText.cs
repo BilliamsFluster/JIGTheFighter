@@ -7,13 +7,13 @@ using StarterAssets;
 public class ScoreText : MonoBehaviour
 {
     public Text text;
-    [SerializeField] private GameObject Character;
-    ThirdPersonController controller;
+    
+    
 
     // Start is called before the first frame update
     void Start()
     {
-        controller = Character.GetComponent<ThirdPersonController>();
+        
     }
 
     // Update is called once per frame
@@ -25,16 +25,10 @@ public class ScoreText : MonoBehaviour
     private void DisplayScore()
     {
 
-        controller = Character.GetComponent<ThirdPersonController>(); 
-        if (controller != null)
-        {
-
-            int? score = controller.GetScore();
-            if (score != null)
-            {
-                text.text = score.ToString();
-            }
-            
-        }
+        int score = GameManager.instance.GetPlayerScore();
+        text.text = score.ToString();
+        
+           
+        
     }
 }
