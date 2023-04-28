@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public AudioClip swordSound;
     public bool gameOver;
     public float swordVolume = 0f;
+    public int playerScore = 0;
 
     [SerializeField] public GameObject playerToSpawn;
     [SerializeField] private List<ThirdPersonController> players;
@@ -18,14 +19,7 @@ public class GameManager : MonoBehaviour
 
 
     //Game States
-
-    //[SerializeField] private GameObject TitleSccreenStateObject;
-    //[SerializeField] private GameObject MainMenuStateObject;
-    //[SerializeField] private GameObject OptionsScreenStateObject;
-    //[SerializeField] private GameObject CreditsScreenStateObject;
-    //[SerializeField] private GameObject GameplayStateObject;
-    //[SerializeField] private GameObject GameOverScreenStateObject;
-    //[SerializeField] private GameObject GameOverScreen;
+    private GameObject GameOverScreen;
 
 
 
@@ -41,17 +35,6 @@ public class GameManager : MonoBehaviour
 
     public void Start()
     {
-        if (SceneManager.GetActiveScene().name != "Level")
-        {
-           
-        }
-        else
-        {
-           
-            
-        }
-
-       
     }
     void Awake()
     {
@@ -69,18 +52,14 @@ public class GameManager : MonoBehaviour
         players = new List<ThirdPersonController>();
         enemies = new List<AIController>();
     }
-    
+   
 
     public void SpawnPlayers(Transform T)
     {
-        
-        
-
         Instantiate(playerToSpawn, T.position, Quaternion.identity);
-
-        //Controller newController = GameObject.Find("PlayerArmature").GetComponent<Controller>();
         Cursor.lockState = CursorLockMode.Locked;
-
+        GameOverScreen = GameObject.Find("GameOverScreen1");
+        GameOverScreen.SetActive(false);
     }
 
 
@@ -89,15 +68,9 @@ public class GameManager : MonoBehaviour
         swordSlash.PlayOneShot(swordSound,swordVolume);
     }
 
-    public void ActivateMainMenuScreen()
-    {
+   
 
-        
-        gameOver = false;
-
-    }
-
-
+   
     public void Restart()
     {
         if (SceneManager.GetActiveScene().name == "Level")
@@ -114,15 +87,16 @@ public class GameManager : MonoBehaviour
     public void GoToMainMenu()
     {
         SceneManager.LoadScene("MainMenu");
+    }
 
-
-
-
+    public int GetPlayerScore()
+    {
+        return playerScore;
     }
     public void ActivateGameOverScreen()
     {
 
-        //GameOverScreen.SetActive(true);
+        GameOverScreen.SetActive(true);
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
         gameOver = true;
