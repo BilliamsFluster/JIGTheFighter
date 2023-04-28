@@ -3309,6 +3309,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 9019943978313471064, guid: 264b9dfdd6f8c5345ae2b28aae47750a, type: 3}
+      propertyPath: swordSlash
+      value: 
+      objectReference: {fileID: 2102604502}
+    - target: {fileID: 9019943978313471064, guid: 264b9dfdd6f8c5345ae2b28aae47750a, type: 3}
       propertyPath: GameOverScreen
       value: 
       objectReference: {fileID: 594193899409735084, guid: e4009d5f193c8134dbf01d4002dc123c, type: 3}
@@ -4732,6 +4736,11 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!82 &2102604502 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 9019943978313471066, guid: 264b9dfdd6f8c5345ae2b28aae47750a, type: 3}
+  m_PrefabInstance: {fileID: 1516723774}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1763757426791172477
 PrefabInstance:
   m_ObjectHideFlags: 0
