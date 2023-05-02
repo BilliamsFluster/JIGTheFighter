@@ -18,46 +18,57 @@ public class AIController : Controller, IHear
     public float meshResolution = 1f;
     public int edgeIterations = 4;
     public float edgeDistance = 0.5f;
+    [SerializeField] protected bool canFlee = false;
+    [SerializeField] protected float enemyDistanceRun = 5.0f;
+    [SerializeField] protected int runAttempts = 0;
+    [SerializeField] protected int maxRunAttempts = 5;
+    
+
+
+
 
     public Transform[] waypoints;
-    int currentWayPointIndex;
+    protected int currentWayPointIndex;
 
-    Vector3 playerLastPosition = Vector3.zero;
-    Vector3 playerPosition;
+    protected Vector3 playerLastPosition = Vector3.zero;
+    protected Vector3 playerPosition;
 
-    float waitTime;
-    float timeToRotate;
-    bool playerInRange;
-    bool playerNear;
-    [SerializeField] private bool isPatrol;
-    bool caughtPlayer;
-    private float _animationBlend;
+    protected float waitTime;
+    protected float timeToRotate;
+    protected bool playerInRange;
+    protected bool playerNear;
+    [SerializeField] protected bool isPatrol;
+    protected bool caughtPlayer;
+    protected float _animationBlend;
     public float SpeedChangeRate = 10.0f;
     public bool notifySpawnerToRespawn = true;
+    [SerializeField] protected float timeBetweenRunAttempts = 1.0f;
 
     //Patroling 
     protected bool walkPointSet;
-    [SerializeField] private float walkPointRange;
-    [SerializeField] private Vector3 walkPoint;
-    [SerializeField] private bool randomPatrol = false;
-    [SerializeField] private LayerMask groundMask;
+    [SerializeField] protected float walkPointRange;
+    [SerializeField] protected Vector3 walkPoint;
+    [SerializeField] protected bool randomPatrol = false;
+    [SerializeField] protected LayerMask groundMask;
+    protected float viewCheckInterval = 0.5f; // Time interval between checks (in seconds)
+    protected float lastViewCheckTime;
 
 
 
-  // animation IDs
-    private int _animIDSpeed;
-    private int _animIDGrounded;
-    private int _animIDJump;
-    private int _animIDFreeFall;
-    private int _animIDMotionSpeed;
-    private int _animIDAttack;
+    // animation IDs
+    protected int _animIDSpeed;
+    protected int _animIDGrounded;
+    protected int _animIDJump;
+    protected int _animIDFreeFall;
+    protected int _animIDMotionSpeed;
+    protected int _animIDAttack;
 
-    private Animator _animator;
-    private bool _hasAnimator;
-    private bool heardSound = false;
-    private Vector3 soundLoc;
+    protected Animator _animator;
+    protected bool _hasAnimator;
+    protected bool heardSound = false;
+    protected Vector3 soundLoc;
 
-    void Start()
+    protected virtual void Start()
     {
         playerPosition = Vector3.zero;
         caughtPlayer = false;
@@ -78,7 +89,7 @@ public class AIController : Controller, IHear
         GameManager.instance.GetEnemies().Add(this);
     }
 
-    private void AssignAnimationIDs()
+    protected void AssignAnimationIDs()
     {
         _animIDSpeed = Animator.StringToHash("Speed");
         _animIDGrounded = Animator.StringToHash("Grounded");
@@ -89,12 +100,11 @@ public class AIController : Controller, IHear
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         _animator = GetComponent<Animator>();
         EnvironmentView();
-
-        if(!isPatrol)
+        if (!isPatrol)
         {
             Chasing();
         }
@@ -102,31 +112,24 @@ public class AIController : Controller, IHear
         {
             Patroling();
         }
+
         if (heardSound)
         {
             navMeshAgent.SetDestination(soundLoc);
             if (Vector3.Distance(transform.position, soundLoc) <= 2f)
             {
                 heardSound = false;
-
             }
         }
-    
-        
 
-          
-        
-
-        
-        
-            
-        
-        
         _animator.SetFloat(_animIDSpeed, navMeshAgent.velocity.magnitude);
         if (!navMeshAgent.updatePosition) GroundCharacter();
 
     }
-    void MoveTo(Vector3 pos)
+
+
+
+    protected void MoveTo(Vector3 pos)
     {
         soundLoc = pos;
         
@@ -139,7 +142,7 @@ public class AIController : Controller, IHear
         Debug.Log("CanHear" + sound.pos);
         MoveTo(sound.pos);
     }
-    private void Attack()
+    protected void Attack()
     {
         if (_hasAnimator)
         {
@@ -148,7 +151,7 @@ public class AIController : Controller, IHear
 
 
     }
-    private void GroundCharacter()
+    protected void GroundCharacter()
     {
         NavMeshHit hit;
         if (NavMesh.SamplePosition(transform.position, out hit, 1.0f, NavMesh.AllAreas))
@@ -178,7 +181,7 @@ public class AIController : Controller, IHear
 
     }
 
-    private void Chasing()
+    protected void Chasing()
     {
         
         
@@ -221,9 +224,9 @@ public class AIController : Controller, IHear
 
     }
 
-  
 
-    private void Patroling()
+
+    protected void Patroling()
     {
         if(playerNear)
         {
@@ -269,7 +272,7 @@ public class AIController : Controller, IHear
         }
     }
 
-    void RandomPatrol()
+   protected void RandomPatrol()
     {
         if (!walkPointSet) SearchWalkPoint(); // find a walkpoint
         if (walkPointSet)
@@ -286,7 +289,7 @@ public class AIController : Controller, IHear
         }
     }
 
-    private void SearchWalkPoint()
+    protected void SearchWalkPoint()
     {
         //calculate random point in range
         float randomRangeZ = Random.Range(-walkPointRange, walkPointRange);
@@ -298,13 +301,13 @@ public class AIController : Controller, IHear
 
     }
 
-    void Move(float speed)
+    protected void Move(float speed)
     {
         navMeshAgent.isStopped = false;
         navMeshAgent.speed = speed;
     }
 
-    void Stop()
+    protected void Stop()
     {
         navMeshAgent.isStopped = true;
         navMeshAgent.speed = 0;
@@ -315,11 +318,11 @@ public class AIController : Controller, IHear
         navMeshAgent.SetDestination(waypoints[currentWayPointIndex].position);
     }
 
-    void CaughtPlayer()
+    protected void CaughtPlayer()
     {
         caughtPlayer = true;
     }
-    void LookingPlayer(Vector3 player)
+    protected void LookingPlayer(Vector3 player)
     {
         navMeshAgent.SetDestination(player);
         Vector3 direction = (player - transform.position).normalized;
@@ -343,19 +346,25 @@ public class AIController : Controller, IHear
             }
         }
     }
-
-    void EnvironmentView()
+    protected void EnvironmentView()
     {
+        if (Time.time - lastViewCheckTime < viewCheckInterval)
+        {
+            return;
+        }
+
+        lastViewCheckTime = Time.time;
+
         Collider[] m_playersInRange = Physics.OverlapSphere(transform.position, viewRadius, playerMask);
+
         for (int i = 0; i < m_playersInRange.Length; i++)
         {
             Transform player = m_playersInRange[i].transform;
             Vector3 dirToPlayer = (player.position - transform.position).normalized;
             float distToPlayer = Vector3.Distance(transform.position, player.transform.position);
+
             if (Vector3.Angle(transform.forward, dirToPlayer) < viewAngle / 2)
             {
-                
-
                 if (!Physics.Raycast(transform.position, dirToPlayer, distToPlayer, obstacleMask))
                 {
                     playerInRange = true;
@@ -364,29 +373,44 @@ public class AIController : Controller, IHear
                 else
                 {
                     playerInRange = false;
-
                 }
             }
+
             if (Vector3.Distance(transform.position, playerPosition) > viewRadius)
             {
                 playerInRange = false;
                 isPatrol = true;
-
             }
-            if (playerInRange) // move to player
-            {
-                playerPosition = player.transform.position;
-                heardSound = false;
-                
-            }
-            
 
-
-            if (Vector3.Distance(transform.position, playerPosition) <= 1f && playerInRange)
+            if (playerInRange)
             {
-                
-                Attack();
+                if (canFlee && runAttempts < maxRunAttempts && distToPlayer < enemyDistanceRun)
+                {
+                    Vector3 newPos = transform.position - dirToPlayer * 2f; // Increase the distance for fleeing
+                    navMeshAgent.SetDestination(newPos);
+
+                    runAttempts++;
+                    break; // Prioritize fleeing before attempting any other actions
+                }
+                else
+                {
+                    playerPosition = player.transform.position;
+                    heardSound = false;
+
+                    if (Vector3.Distance(transform.position, playerPosition) <= 1f)
+                    {
+                        Attack();
+                    }
+                }
             }
         }
+        // Reset isPatrol if the AI has finished fleeing
+        if (canFlee && runAttempts >= maxRunAttempts)
+        {
+            isPatrol = true;
+        }
     }
-}   
+
+
+
+}

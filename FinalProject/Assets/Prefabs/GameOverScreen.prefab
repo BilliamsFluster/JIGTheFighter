@@ -96,7 +96,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   text: {fileID: 0}
-  Character: {fileID: 9095482903650051002, guid: 373bf1db47021ee409b3ea2a8fd91007, type: 3}
 --- !u!1 &594193899409735084
 GameObject:
   m_ObjectHideFlags: 0

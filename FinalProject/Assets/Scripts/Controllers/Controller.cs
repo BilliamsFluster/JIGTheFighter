@@ -22,7 +22,7 @@ public class Controller : MonoBehaviour
 
     public virtual void AddScore(int score)
     {
-        playerScore = score;
+        playerScore += score;
     }
 
 
