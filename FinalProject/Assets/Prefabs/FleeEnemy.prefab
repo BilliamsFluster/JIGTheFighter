@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3502261973826551449}
   m_Layer: 6
-  m_Name: Enemy
+  m_Name: FleeEnemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -671,7 +671,7 @@ MonoBehaviour:
   meshResolution: 1
   edgeIterations: 4
   edgeDistance: 0.5
-  canFlee: 0
+  canFlee: 1
   enemyDistanceRun: 5
   runAttempts: 0
   maxRunAttempts: 5

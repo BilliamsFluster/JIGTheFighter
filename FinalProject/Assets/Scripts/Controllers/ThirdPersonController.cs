@@ -291,7 +291,7 @@ namespace StarterAssets
             _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
                              new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
             //Rigidbody rig = GetComponent<Rigidbody>();
-            //rig.AddForce(targetDirection.normalized * (_speed * Time.deltaTime) +
+            //rig.AddForce(targetDirection.normalized * (_speed * Time.deltaTime));
                              //
                              //new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
             // update animator if using character

@@ -2,22 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemySpawner : MonoBehaviour
+public class FleeEnemySpawner : MonoBehaviour
 {
     [SerializeField] private GameObject enemyToSpawn;
     [SerializeField] private float playerCount;
-    [SerializeField] private Transform PlayerSpawnLocation;
-    public bool canSpawnCharacter = true;
 
     // Start is called before the first frame update
     void Start()
     {
         SpawnPlayers(); // spawn enemies
-        if(canSpawnCharacter)
-        {
-            GameManager.instance.SpawnPlayers(PlayerSpawnLocation); // spawn the main character 
-            
-        }
         AIHealthManager.OnAIDeath += HandleAIDeath;
     }
 
@@ -71,11 +64,11 @@ public class EnemySpawner : MonoBehaviour
 
 
                 Instantiate(enemyToSpawn, randomPosition, Quaternion.identity);
-                
+
 
                 //Controller newController = GameObject.Find("PlayerArmature").GetComponent<Controller>();
                 Cursor.lockState = CursorLockMode.Locked;
-                
+
 
                 // Wait for a short amount of time to allow the new objects to initialize
             }
